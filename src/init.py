@@ -1,5 +1,5 @@
 import sqlite3 as db
-import hashlib as hs
+from random import randint as rd
 
 rt_db = ".\\src\\db"
 
@@ -7,14 +7,20 @@ class dataBase:
     def __init__():
         ...
 
+    def convertForDB(filename):
+        with open(filename, 'rb') as file:
+            data = file.read()
+        return data
+
+    @staticmethod
     def create(dbName, conteudo):
         con = db.connect("{}\\{}.db".format(rt_db, dbName))
         cursor = con.cursor()
         cursor.execute(f'''
         CREATE TABLE IF NOT EXISTS {conteudo} (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            caminho TEXT NOT NULL,
-            resultado INTEGER NOT NULL
+            image BLOB NOT NULL,
+            resultado TEXT NOT NULL
         )
         ''')
 
@@ -22,22 +28,46 @@ class dataBase:
 
         con.close()
 
-    def add(dbName, conteudo):
-        con = db.connect("{}\\{}.db".format(rt_db, dbName))
+    @staticmethod
+    def add(dbName, conteudo, questao):
+        con = db.connect(f"{rt_db}\\{dbName}.db")
         cursor = con.cursor()
-        cursor.execute(f'''
-            INSERT INTO {conteudo} (caminho, resultado)
-            VALUES ('Alice', 30), ('Bob', 25), ('Charlie', 35)
-        ''')
+        cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{conteudo}';")
+        table_exist = cursor.fetchone()
+        if not table_exist:
+            dataBase.create(dbName, conteudo)
+
+        binary = dataBase.convertForDB(questao[0])
+
+        cursor.execute(f"""
+            INSERT INTO {conteudo} (image, resultado) VALUES (?, ?)
+        """, (binary, questao[1]))
 
         con.commit()
         con.close()
 
-
-    def find(dbName):
+    @staticmethod
+    def find(dbName, conteudo, idS):
         con = db.connect("{}\\{}.db".format(rt_db, dbName))
         cursor = con.cursor()
 
+        cursor.execute(f"SELECT COUNT(*) FROM {conteudo}")
+        tableSize = cursor.fetchone()[0]
+
+        if idS > tableSize:
+            num = rd(1, tableSize)
+        else:
+            num = idS
+        
+        cursor.execute(f"SELECT image, resultado FROM {conteudo} WHERE id = ?", (num,))
+        line = cursor.fetchone()
+        if line:
+            print(f"\n\tResultado: {line[1]}")
+
 if __name__ == "__main__":
-    dataBase.create("2023", "funcao_afim")
-    dataBase.add("2023", "funcao_afim")
+    dados = [(".\\src\\img\\Eq1.png", "-1")]
+
+    for i in dados:
+        dataBase.add("2023", "trigonometria", i)
+
+    dataBase.find("2023", "trigonometria", 1)
