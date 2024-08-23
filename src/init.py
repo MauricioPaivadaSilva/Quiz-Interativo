@@ -61,8 +61,7 @@ class dataBase:
         
         cursor.execute(f"SELECT image, resultado FROM {conteudo} WHERE id = ?", (num,))
         line = cursor.fetchone()
-        if line:
-            print(f"\n\tResultado: {line[1]}")
+        return line
 
 if __name__ == "__main__":
     dados = [(".\\src\\img\\Eq1.png", "-1")]
