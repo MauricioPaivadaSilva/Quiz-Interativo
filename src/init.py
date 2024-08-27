@@ -1,19 +1,19 @@
-import sqlite3 as db
-from random import randint as rd
+import sqlite3 as db # Importando a biblioteca que trabalha com banco de dados
+from random import randint as rd # Importanto biblioteca para geração de números pseudo aleatórios
 
-rt_db = ".\\src\\db"
+rt_db = ".\\src\\db" # Especificando o caminho total até o banco de dados a partir do programa lider
 
 class dataBase:
     def __init__():
         ...
 
-    def convertForDB(filename):
+    def convertForDB(filename): # Função que converte a imagem para ser inserida no banco de dados
         with open(filename, 'rb') as file:
             data = file.read()
         return data
 
     @staticmethod
-    def create(dbName, conteudo):
+    def create(dbName, conteudo): # Função que cria o banco de dados, com os parâmetros (id; image; resultado)
         con = db.connect("{}\\{}.db".format(rt_db, dbName))
         cursor = con.cursor()
         cursor.execute(f'''
@@ -29,7 +29,7 @@ class dataBase:
         con.close()
 
     @staticmethod
-    def add(dbName, conteudo, questao):
+    def add(dbName, conteudo, questao): # Função para adicionar novas questões
         con = db.connect(f"{rt_db}\\{dbName}.db")
         cursor = con.cursor()
         cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{conteudo}';")
@@ -47,7 +47,7 @@ class dataBase:
         con.close()
 
     @staticmethod
-    def find(dbName, conteudo, idS):
+    def find(dbName, conteudo, idS): # Função para procurar as questões no banco de dados com base no id
         con = db.connect("{}\\{}.db".format(rt_db, dbName))
         cursor = con.cursor()
 
@@ -61,6 +61,8 @@ class dataBase:
         
         cursor.execute(f"SELECT image, resultado FROM {conteudo} WHERE id = ?", (num,))
         line = cursor.fetchone()
+
+        con.close()
         return line
 
 if __name__ == "__main__":
