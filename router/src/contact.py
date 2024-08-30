@@ -1,7 +1,7 @@
 import sqlite3 as db # Importando a biblioteca que trabalha com banco de dados
 from random import randint as rd # Importanto biblioteca para geração de números pseudo aleatórios
 
-rt_db = ".\\src\\db" # Especificando o caminho total até o banco de dados a partir do programa lider
+rt_db = ".\\router\\db" # Especificando o caminho total até o banco de dados a partir do programa lider
 
 class dataBase:
     def __init__():
@@ -66,9 +66,18 @@ class dataBase:
         return line
 
 if __name__ == "__main__":
-    dados = [(".\\src\\img\\Eq1.png", "-1")]
+
+    i = 1
+
+    dados = []
+
+    while i < 8:
+        dados.append((f".\\src\\img\\Eq{i}.png", "-1"))
+        i += 1
+    
+    #dados = [(".\\src\\img\\Eq1.png", "-1")]
 
     for i in dados:
-        dataBase.add("2023", "trigonometria", i)
+        dataBase.add("2023", "funcoes", i)
 
-    dataBase.find("2023", "trigonometria", 1)
+    dataBase.find("2023", "funcoes", 1)
