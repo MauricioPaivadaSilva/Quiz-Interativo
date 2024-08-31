@@ -1,13 +1,25 @@
+import tkinter as tk
 from tkinter import * # Importando a biblioteca para iniciar a janela
+from tkinter import ttk
+from tkinter import filedialog as fl # Importando a parte da biblioteca Tk para trabalhar com arquivos.
 from PIL import Image, ImageTk # Importando funções que facilitam a manipulação de imagens em janelas
 import random # Biblioteca para gerar números pseudo aleatórios
 import io # Biblioteca para trabalhar com entrada e saida de dados.
+import os # Para listar todos os meus DBs
 
 from router.src.contact import dataBase as db # Importândo o módulo de comunicação com o banco de dados
 
+DBS = []
+
+ANO = ""
+CONTEUDO = ""
 VALUES = 0 # Variável global para armazenar os dados oriundos do banco de dados
 A = 0 # Variável global que armazena a pontuação de A
 B = 0 # Variável global que armazena a pontuação de B
+
+files = os.listdir(".\\router\\db")
+for file in files:
+    DBS.append(str(file[:-3]))
 
 window = Tk() # Chamando a janela de window
 window.geometry("1080x600") # Especificando as dimenções da janela
@@ -21,13 +33,19 @@ def windowGame(): # Cria a janela do jogo
 
     cleanWindow()
 
-    global VALUES
+    menuBar = tk.Menu(window)
+    menu = tk.Menu(menuBar, tearoff=0)
+    menu.add_command(label="Voltar", command=windowHome)
+    window.config(menu=menu)
 
-    def home(): # Retorna a tela inicial
-        ...
+    global VALUES
+    global CONTEUDO
+    global ANO
     
-    def restart(): # Zera as pontuações
-        ...
+    def restart(canvas): # Zera as pontuações
+        A = 0
+        B = 0
+        getDB(canvas)
 
     def displayImage(canvas): # Função que apresenta a questão como imagem
         image_data = VALUES[0]
@@ -38,7 +56,9 @@ def windowGame(): # Cria a janela do jogo
 
     def getDB(canvas): # Função que pede para o banco de dados a nova imagem e a resposta
         global VALUES
-        get = db.find('2023', "funcoes", random.randint(1, 10000))
+        global ANO
+        global CONTEUDO
+        get = db.find(ANO, CONTEUDO, random.randint(1, 10000))
         VALUES = get
         resposta.delete(0, 100)
         displayImage(canvas)
@@ -83,7 +103,7 @@ def windowGame(): # Cria a janela do jogo
     canvas.configure(bg="white") # Especificando a cor de fundo do ambiente da imagem
     canvas.pack(side=TOP, padx=10, pady=10) # Posicionando o ambiente da imagem
 
-    VALUES = [db.find("2023", "funcoes", 2)[0], db.find("2023", "funcoes", 2)[1]] # Iniciando a variável global com um exercício e uma resposta
+    VALUES = [db.find(ANO, CONTEUDO, 2)[0], db.find(ANO, CONTEUDO, 2)[1]] # Iniciando a variável global com um exercício e uma resposta
     displayImage(canvas) # Iniciando a apresentação da imagem
 
     resposta = Entry(window, width=70, font= "Times 20 bold") # Iniciando o campo de resposta
@@ -106,7 +126,104 @@ def windowGame(): # Cria a janela do jogo
     scoreB.pack(side=RIGHT, padx=10, pady=10) # Posicionando a pontuação de B
 
 def windowAdd(): # Janela para adicionar novas questões ao jogo
-    ...
+    cleanWindow()
+
+    menuBar = tk.Menu(window)
+    menu = tk.Menu(menuBar, tearoff=0)
+    menu.add_command(label="Voltar", command=windowHome)
+    window.config(menu=menu)
+
+    FILEPWD = ""
+
+    def fileFind():
+        filePwd = fl.askopenfilename(
+            title="Selecione uma imagem",
+            filetypes=[("Arquivos de imagem", "*.jpg;*.jpeg;*.png;*.gif")]
+        )
+        if filePwd:
+            FILEPWD = filePwd
+            quest.configure(text=str(filePwd))
+
+    def send():
+        resp.delete(0, 100)
+
+    infoYear = Label(window, text="Turma:")
+    infoYear.configure(font="Times 20 bold")
+    infoYear.grid(row=0, column=0, padx=10, pady=10)
+
+    year = Entry(window, width=20, font="Times 14 bold")
+    year.grid(row=0, column=1, padx=10, pady=10)
+
+    infoTable = Label(window, text="Conteúdo:")
+    infoTable.configure(font="Times 20 bold")
+    infoTable.grid(row=1, column=0, padx=10, pady=10)
+
+    table = Entry(window, width=20, font="Times 14 bold")
+    table.grid(row=1, column=1, padx=10, pady=10)
+
+    buttonQuest = Button(window, text="Adicionar questão", font="Times 10 bold", command=fileFind)
+    buttonQuest.grid(row=2, column=0, padx=10, pady=10)
+
+    quest = Label(window, text="", font="Times, 8")
+    quest.grid(row=2, column=1, padx=10, pady=10)
+
+    infoResp = Label(window, text="Resposta:")
+    infoResp.configure(font="Times 20 bold")
+    infoResp.grid(row=3, column=2, padx=10, pady=10)
+
+    resp = Entry(window, width=20, font="Times 14 bold")
+    resp.grid(row=3, column=3, padx=10, pady=10)
+
+    buttonSend = Button(window, text="Adicionar", font="Times 10 bold", command=send)
+    buttonSend.grid(row=4, column=0, padx=10, pady=10)
+
+def windowSet():
+    cleanWindow()
+
+    tabelas = []
+
+    def update(event):
+        dbName = str(year.get())
+        conteudos = db.tables(dbName=dbName)
+        for conteudo in conteudos:
+            conteudo = conteudo[0]
+            tabelas.append(conteudo)
+
+        # Atualiza o Combobox
+        table['values'] = tabelas
+
+
+    def start():
+        global ANO
+        global CONTEUDO
+        ANO = year.get().lower()
+        CONTEUDO = table.get().lower()
+        if(CONTEUDO != "" and ANO != ""):
+            windowGame()
+        
+
+    menuBar = tk.Menu(window)
+    menu = tk.Menu(menuBar, tearoff=0)
+    menu.add_command(label="Voltar", command=windowHome)
+    window.config(menu=menu)
+
+    infoYear = Label(window, text="Turma:")
+    infoYear.configure(font="Times 20 bold")
+    infoYear.grid(row=0, column=0, padx=10, pady=10)
+
+    year = ttk.Combobox(window, values=DBS)
+    year.grid(row=0, column=1, padx=10, pady=10)
+    year.bind("<<ComboboxSelected>>", update)
+
+    infoTable = Label(window, text="Conteúdo:")
+    infoTable.configure(font="Times 20 bold")
+    infoTable.grid(row=1, column=0, padx=10, pady=10)
+
+    table = ttk.Combobox(window, values=tabelas)
+    table.grid(row=1, column=1, padx=10, pady=10)
+
+    buttonSend = Button(window, text="Iniciar jogo", font="Times 10 bold", command=start)
+    buttonSend.grid(row=4, column=0, padx=10, pady=10)
 
 def windowHome(): # Cria a janela de início do jogo
     cleanWindow()
@@ -120,8 +237,11 @@ def windowHome(): # Cria a janela de início do jogo
     canvas.create_image(125, 125, image=img, anchor=CENTER)
     canvas.image = img
 
-    start = Button(window, text="Start", command=windowGame)
+    start = Button(window, text="Jogo", command=windowSet)
     start.pack(padx=10, pady=10)
+
+    addQuest = Button(window, text="Modo professor", command=windowAdd)
+    addQuest.pack(padx=10, pady=10)
 
 windowHome()
 

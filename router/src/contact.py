@@ -46,6 +46,8 @@ class dataBase:
         con.commit()
         con.close()
 
+        return "Inserido"
+
     @staticmethod
     def find(dbName, conteudo, idS): # Função para procurar as questões no banco de dados com base no id
         con = db.connect("{}\\{}.db".format(rt_db, dbName))
@@ -64,6 +66,16 @@ class dataBase:
 
         con.close()
         return line
+
+    @staticmethod
+    def tables(dbName):
+        con = db.connect("{}\\{}.db".format(rt_db, dbName))
+        cursor = con.cursor()
+
+        cursor.execute("SELECT name FROM sqlite_sequence")
+        tabelas = cursor.fetchall()
+
+        return tabelas
 
 if __name__ == "__main__":
 
