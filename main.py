@@ -17,13 +17,18 @@ VALUES = 0 # Variável global para armazenar os dados oriundos do banco de dados
 A = 0 # Variável global que armazena a pontuação de A
 B = 0 # Variável global que armazena a pontuação de B
 
-files = os.listdir(".\\router\\db")
-for file in files:
-    DBS.append(str(file[:-3]))
+def findDBS():
+    files = os.listdir(".\\router\\db")
+    for file in files:
+        DBS.append(str(file[:-3]))
 
 window = Tk() # Chamando a janela de window
 window.geometry("1080x600") # Especificando as dimenções da janela
 window.title("Quiz de matemática") # Nome da janela
+window.config(bg='grey')
+
+def rgb_to_hex(rgb):
+    return "#%02x%02x%02x" % rgb
 
 def cleanWindow():
     for widget in window.winfo_children(): # Limpa os dados anteriores da janela, para poder iniciar a janela nova
@@ -33,25 +38,31 @@ def windowGame(): # Cria a janela do jogo
 
     cleanWindow()
 
+    def restart(canvas): # Zera as pontuações
+        global A
+        global B
+        A = 0
+        B = 0
+        getDB(canvas)
+
+    blue_rgb = (47, 111, 173)
+    hex_blue = rgb_to_hex(blue_rgb)
+
     menuBar = tk.Menu(window)
     menu = tk.Menu(menuBar, tearoff=0)
     menu.add_command(label="Voltar", command=windowHome)
+    menu.add_command(label="Reiniciar", command=windowGame)
     window.config(menu=menu)
 
     global VALUES
     global CONTEUDO
     global ANO
-    
-    def restart(canvas): # Zera as pontuações
-        A = 0
-        B = 0
-        getDB(canvas)
 
     def displayImage(canvas): # Função que apresenta a questão como imagem
         image_data = VALUES[0]
         image = Image.open(io.BytesIO(image_data))
         img = ImageTk.PhotoImage(image)
-        canvas.create_image(500, 25, image=img, anchor=CENTER)
+        canvas.create_image(150, 100, image=img, anchor=CENTER)
         canvas.image = img
 
     def getDB(canvas): # Função que pede para o banco de dados a nova imagem e a resposta
@@ -60,7 +71,10 @@ def windowGame(): # Cria a janela do jogo
         global CONTEUDO
         get = db.find(ANO, CONTEUDO, random.randint(1, 10000))
         VALUES = get
-        resposta.delete(0, 100)
+        try:
+            resposta.delete(0, 100)
+        except:
+            pass
         displayImage(canvas)
 
     def validateA(canvas): # Função para validação da resposta de A
@@ -99,22 +113,27 @@ def windowGame(): # Cria a janela do jogo
     ### ==> !!! IMPORTANTE FICAR TUDO ONDE ESTÁ !!! <== ###
     #######################################################
 
-    canvas = Canvas(window, width=1000, height=50) # Iniciando o ambiente da imagem
+    canvas = Canvas(window, width=300, height=200) # Iniciando o ambiente da imagem
     canvas.configure(bg="white") # Especificando a cor de fundo do ambiente da imagem
     canvas.pack(side=TOP, padx=10, pady=10) # Posicionando o ambiente da imagem
 
-    VALUES = [db.find(ANO, CONTEUDO, 2)[0], db.find(ANO, CONTEUDO, 2)[1]] # Iniciando a variável global com um exercício e uma resposta
+    if(A != 0 or B != 0):
+        restart(canvas)
+
+    n = random.randint(1, 1000)
+
+    VALUES = [db.find(ANO, CONTEUDO, n)[0], db.find(ANO, CONTEUDO, n)[1]] # Iniciando a variável global com um exercício e uma resposta
     displayImage(canvas) # Iniciando a apresentação da imagem
 
-    resposta = Entry(window, width=70, font= "Times 20 bold") # Iniciando o campo de resposta
-    resposta.pack(padx=10, pady=10) # Determinando especificações do campo de resposta
+    resposta = Entry(window, font= "Times 20 bold") # Iniciando o campo de resposta
+    resposta.pack(fill='x', padx=10, pady=10) # Determinando especificações do campo de resposta
 
     botao_A =Button(window, text="time A", width=10, height=5) # Iniciando o botão A
     botao_A.configure(bg="yellow", font="Times 24 bold", command=lambda: validateA(canvas)) # Configurando o botão A
     botao_A.pack(side=LEFT, padx=10, pady=10) # Posicionando o botão A
 
     botao_B =Button(window, text="time B", width=10, height=5) # Iniciando o botão B
-    botao_B.configure(bg="blue", font="Times 24 bold", command=lambda: validateB(canvas)) # Configurando o botão B
+    botao_B.configure(bg=hex_blue, font="Times 24 bold", command=lambda: validateB(canvas)) # Configurando o botão B
     botao_B.pack(side=RIGHT, padx=10, pady=10) # Posicionando o botão B
 
     scoreA = Label(window, text=str(A)) # Apresentando a pontuação de A
@@ -122,7 +141,7 @@ def windowGame(): # Cria a janela do jogo
     scoreA.pack(side=LEFT, padx=10, pady=10) # Posicionando a pontuação de A
 
     scoreB = Label(window, text=str(B)) # Apresentando a pontuação de B
-    scoreB.configure(bg="blue", font="Times 24 bold") # Configurando a apresentação da pontuação de B
+    scoreB.configure(bg=hex_blue, font="Times 24 bold") # Configurando a apresentação da pontuação de B
     scoreB.pack(side=RIGHT, padx=10, pady=10) # Posicionando a pontuação de B
 
 def windowAdd(): # Janela para adicionar novas questões ao jogo
@@ -136,6 +155,7 @@ def windowAdd(): # Janela para adicionar novas questões ao jogo
     FILEPWD = ""
 
     def fileFind():
+        global FILEPWD
         filePwd = fl.askopenfilename(
             title="Selecione uma imagem",
             filetypes=[("Arquivos de imagem", "*.jpg;*.jpeg;*.png;*.gif")]
@@ -145,6 +165,19 @@ def windowAdd(): # Janela para adicionar novas questões ao jogo
             quest.configure(text=str(filePwd))
 
     def send():
+        global FILEPWD
+        conteudo = table.get().split(" ")
+        tabela = ""
+        for i in conteudo:
+            if(tabela == ""):
+                tabela = f"{i}"
+            else:
+                tabela = f"{tabela}_{i}"
+        print(f"\n{tabela}\n")
+        pwd = str(FILEPWD)
+        rp = str(resp.get())
+        ad = (pwd, rp)
+        db.add(str(year.get()), tabela, ad)
         resp.delete(0, 100)
 
     infoYear = Label(window, text="Turma:")
@@ -169,20 +202,24 @@ def windowAdd(): # Janela para adicionar novas questões ao jogo
 
     infoResp = Label(window, text="Resposta:")
     infoResp.configure(font="Times 20 bold")
-    infoResp.grid(row=3, column=2, padx=10, pady=10)
+    infoResp.grid(row=2, column=2, padx=10, pady=10)
 
     resp = Entry(window, width=20, font="Times 14 bold")
-    resp.grid(row=3, column=3, padx=10, pady=10)
+    resp.grid(row=2, column=3, padx=10, pady=10)
 
     buttonSend = Button(window, text="Adicionar", font="Times 10 bold", command=send)
-    buttonSend.grid(row=4, column=0, padx=10, pady=10)
+    buttonSend.grid(row=3, column=0, padx=10, pady=10)
 
 def windowSet():
     cleanWindow()
+    global DBS
+    DBS = []
+    findDBS()
 
     tabelas = []
 
     def update(event):
+        tabelas = []
         dbName = str(year.get())
         conteudos = db.tables(dbName=dbName)
         for conteudo in conteudos:
