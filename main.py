@@ -25,7 +25,7 @@ def findDBS():
 window = Tk() # Chamando a janela de window
 window.geometry("1080x600") # Especificando as dimenções da janela
 window.title("Quiz de matemática") # Nome da janela
-window.config(bg='grey')
+#window.config(bg='grey')
 
 def rgb_to_hex(rgb):
     return "#%02x%02x%02x" % rgb
@@ -51,7 +51,7 @@ def windowGame(): # Cria a janela do jogo
     menuBar = tk.Menu(window)
     menu = tk.Menu(menuBar, tearoff=0)
     menu.add_command(label="Voltar", command=windowHome)
-    menu.add_command(label="Reiniciar", command=windowGame)
+    menu.add_command(label="Novo Jogo", command=windowGame)
     window.config(menu=menu)
 
     global VALUES
@@ -125,7 +125,7 @@ def windowGame(): # Cria a janela do jogo
     VALUES = [db.find(ANO, CONTEUDO, n)[0], db.find(ANO, CONTEUDO, n)[1]] # Iniciando a variável global com um exercício e uma resposta
     displayImage(canvas) # Iniciando a apresentação da imagem
 
-    resposta = Entry(window, font= "Times 20 bold") # Iniciando o campo de resposta
+    resposta = Entry(window, font="Times 20 bold") # Iniciando o campo de resposta
     resposta.pack(fill='x', padx=10, pady=10) # Determinando especificações do campo de resposta
 
     botao_A =Button(window, text="time A", width=10, height=5) # Iniciando o botão A
@@ -162,7 +162,10 @@ def windowAdd(): # Janela para adicionar novas questões ao jogo
         )
         if filePwd:
             FILEPWD = filePwd
-            quest.configure(text=str(filePwd))
+            caminho = filePwd.split("/")
+            inicio = 0
+            final = len(caminho) - 1
+            quest.configure(text=str(f"{caminho[inicio]}/.../{caminho[final]}"))
 
     def send():
         global FILEPWD
@@ -181,34 +184,34 @@ def windowAdd(): # Janela para adicionar novas questões ao jogo
         resp.delete(0, 100)
 
     infoYear = Label(window, text="Turma:")
-    infoYear.configure(font="Times 20 bold")
+    infoYear.configure(font="Times 18 bold")
     infoYear.grid(row=0, column=0, padx=10, pady=10)
 
     year = Entry(window, width=20, font="Times 14 bold")
     year.grid(row=0, column=1, padx=10, pady=10)
 
     infoTable = Label(window, text="Conteúdo:")
-    infoTable.configure(font="Times 20 bold")
-    infoTable.grid(row=1, column=0, padx=10, pady=10)
+    infoTable.configure(font="Times 18 bold")
+    infoTable.grid(row=0, column=2, padx=10, pady=10)
 
     table = Entry(window, width=20, font="Times 14 bold")
-    table.grid(row=1, column=1, padx=10, pady=10)
+    table.grid(row=0, column=3, padx=10, pady=10)
 
-    buttonQuest = Button(window, text="Adicionar questão", font="Times 10 bold", command=fileFind)
-    buttonQuest.grid(row=2, column=0, padx=10, pady=10)
+    buttonQuest = Button(window, text="Adicionar questão", font="Times 18 bold", command=fileFind)
+    buttonQuest.grid(row=1, column=0, padx=10, pady=10)
 
-    quest = Label(window, text="", font="Times, 8")
-    quest.grid(row=2, column=1, padx=10, pady=10)
+    quest = Label(window, text="", font="Times, 18")
+    quest.grid(row=1, column=1, padx=10, pady=10)
 
     infoResp = Label(window, text="Resposta:")
-    infoResp.configure(font="Times 20 bold")
-    infoResp.grid(row=2, column=2, padx=10, pady=10)
+    infoResp.configure(font="Times 18 bold")
+    infoResp.grid(row=1, column=2, padx=10, pady=10)
 
     resp = Entry(window, width=20, font="Times 14 bold")
-    resp.grid(row=2, column=3, padx=10, pady=10)
+    resp.grid(row=1, column=3, padx=10, pady=10)
 
-    buttonSend = Button(window, text="Adicionar", font="Times 10 bold", command=send)
-    buttonSend.grid(row=3, column=0, padx=10, pady=10)
+    buttonSend = Button(window, text="Adicionar", font="Times 18 bold", command=send)
+    buttonSend.grid(row=2, column=0, padx=10, pady=10)
 
 def windowSet():
     cleanWindow()
@@ -245,7 +248,7 @@ def windowSet():
     window.config(menu=menu)
 
     infoYear = Label(window, text="Turma:")
-    infoYear.configure(font="Times 20 bold")
+    infoYear.configure(font="Times 18 bold")
     infoYear.grid(row=0, column=0, padx=10, pady=10)
 
     year = ttk.Combobox(window, values=DBS)
@@ -253,13 +256,13 @@ def windowSet():
     year.bind("<<ComboboxSelected>>", update)
 
     infoTable = Label(window, text="Conteúdo:")
-    infoTable.configure(font="Times 20 bold")
+    infoTable.configure(font="Times 18 bold")
     infoTable.grid(row=1, column=0, padx=10, pady=10)
 
     table = ttk.Combobox(window, values=tabelas)
     table.grid(row=1, column=1, padx=10, pady=10)
 
-    buttonSend = Button(window, text="Iniciar jogo", font="Times 10 bold", command=start)
+    buttonSend = Button(window, text="Iniciar jogo", font="Times 18 bold", command=start)
     buttonSend.grid(row=4, column=0, padx=10, pady=10)
 
 def windowHome(): # Cria a janela de início do jogo
@@ -274,10 +277,10 @@ def windowHome(): # Cria a janela de início do jogo
     canvas.create_image(125, 125, image=img, anchor=CENTER)
     canvas.image = img
 
-    start = Button(window, text="Jogo", command=windowSet)
+    start = Button(window, text="Jogo", font="Times 18 bold", command=windowSet)
     start.pack(padx=10, pady=10)
 
-    addQuest = Button(window, text="Modo professor", command=windowAdd)
+    addQuest = Button(window, text="Modo professor", font="Times 18 bold", command=windowAdd)
     addQuest.pack(padx=10, pady=10)
 
 windowHome()
