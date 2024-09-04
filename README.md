@@ -2,7 +2,7 @@
 
 # Quiz da Matemática
 
-![GitHub top language](https://img.shields.io/github/languages/top/MauricioPaivadaSilva/Quiz-Interativo) ![GitHub language count](https://img.shields.io/github/languages/count/MauricioPaivadaSilva/Quiz-Interativoy) ![GitHub License](https://img.shields.io/github/license/MauricioPaivadaSilva/Quiz-Interativo) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/MauricioPaivadaSilva/Quiz-Interativo/main) ![GitHub repo size](https://img.shields.io/github/repo-size/MauricioPaivadaSilva/Quiz-Interativo)
+![GitHub top language](https://img.shields.io/github/languages/top/MauricioPaivadaSilva/Quiz-da-Matematica) ![GitHub language count](https://img.shields.io/github/languages/count/MauricioPaivadaSilva/Quiz-da-Matematica) ![GitHub License](https://img.shields.io/github/license/MauricioPaivadaSilva/Quiz-da-Matematica) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/MauricioPaivadaSilva/Quiz-da-Matematica/main) ![GitHub repo size](https://img.shields.io/github/repo-size/MauricioPaivadaSilva/Quiz-da-Matematica)
 
 </div>
 
