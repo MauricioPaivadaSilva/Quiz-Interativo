@@ -211,7 +211,7 @@ def windowAdd(): # Janela para adicionar novas questões ao jogo
     resp.grid(row=1, column=3, padx=10, pady=10)
 
     buttonSend = Button(window, text="Adicionar", font="Times 18 bold", command=send)
-    buttonSend.grid(row=2, column=0, padx=10, pady=10)
+    buttonSeld.grid(row=2, column=0, padx=10, pady=10)
 
 def windowSet():
     cleanWindow()
